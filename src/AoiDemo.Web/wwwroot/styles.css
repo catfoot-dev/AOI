@@ -1,0 +1,167 @@
+:root {
+  --bg: #0f1412;
+  --panel: rgba(15, 17, 20, 0.82);
+  --panel-strong: rgba(16, 20, 24, 0.94);
+  --line: rgba(150, 171, 194, 0.18);
+  --accent: #7fbdff;
+  --accent-soft: rgba(127, 210, 255, 0.22);
+  --danger: #ff8d70;
+  --text: #ebeef5;
+  --muted: #a9b1ba;
+  --player: #bff3ff;
+  --npc: #80c9f1;
+  --grid: rgba(127, 182, 255, 0.08);
+  --quadtree: rgba(112, 162, 255, 0.28);
+  --canvas-bg: #101714;
+  --shadow: 0 30px 80px rgba(0, 0, 0, 0.38);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  font-family: "맑은 고딕", sans-serif;
+}
+
+input {
+  outline: none;
+  accent-color: var(--accent);
+  margin: 1px 0 0;
+}
+
+button {
+  font: inherit;
+}
+
+#canvas {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+#status {
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+#control {
+  top: 100px;
+  right: 20px;
+  width: 240px;
+}
+
+#metrics {
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.hud {
+  display: flex;
+  position: fixed;
+  gap: 12px;
+  color: var(--muted);
+  background: rgba(224,224,224,0.1);
+  font-size: 0.92rem;
+}
+
+.card {
+  width: 100%;
+}
+
+.card-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px 10px 0 10px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.hud-items {
+  display: flex;
+  flex-direction: row;
+  margin: 0 10px;
+}
+
+.hud-item {
+  padding: 5px;
+  width: 140px;
+}
+
+.hud-item-label {
+  color: var(--muted);
+  font-size: 0.6rem;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  letter-spacing: 0.08em;
+}
+
+.hud-item-value {
+  font-size: 1rem;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 5px 15px 15px 15px;
+}
+
+.stack-item {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.stack-item.right {
+  justify-content: end;
+}
+
+.stack-label {
+  display: flex;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.action {
+  color: #060b10;
+  background: var(--accent);
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.action:hover {
+  transform: translateY(-1px);
+}
+
+.action:active {
+  transform: translateY(1px);
+}
+
+#tick-label {
+  width: 90px;
+  text-align: right;
+}

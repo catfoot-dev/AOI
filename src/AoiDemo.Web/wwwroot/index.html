@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AOI WebSocket Demo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="canvas" width="100%" height="100%"></canvas>
+
+  <div id="status" class="hud">
+    <section class="card">
+      <div class="card-header">
+        <div class="eyebrow">Status</div>
+      </div>
+
+      <div class="hud-items">
+        <div class="hud-item">
+          <div class="hud-item-label">연결</div>
+          <div id="connection-status" class="hud-item-value">connecting</div>
+        </div>
+        <div class="hud-item">
+          <div class="hud-item-label">플레이어</div>
+          <div id="player-label" class="hud-item-value">-</div>
+        </div>
+        <div class="hud-item">
+          <div class="hud-item-label">가시 엔티티</div>
+          <div id="visible-count" class="hud-item-value">0</div>
+        </div>
+        <div class="hud-item">
+          <div class="hud-item-label">알고리즘</div>
+          <div id="algorithm-label" class="hud-item-value">-</div>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div id="control" class="hud">
+    <section class="card">
+      <div class="card-header">
+        <div class="eyebrow">AOI(Area of Interest) Demo</div>
+      </div>
+
+      <div class="stack">
+        <div class="stack-item">
+          <div class="stack-label">Algorithm</div>
+          <div class="field">
+            <label for="algorithm-brute-force">
+              <input type="radio" id="algorithm-brute-force" name="algorithm" value="bruteForce">
+              Brute Force
+            </label>
+            <label for="algorithm-uniform-grid">
+              <input type="radio" id="algorithm-uniform-grid" name="algorithm" value="uniformGrid">
+              Uniform Grid
+            </label>
+            <label for="algorithm-quadtree">
+              <input type="radio" id="algorithm-quadtree" name="algorithm" value="quadtree">
+              Quadtree
+            </label>
+          </div>
+        </div>
+  
+        <div class="stack-item">
+          <div class="stack-label">Area</div>
+          <label class="toggle">
+            <input type="checkbox" id="overlay-toggle" checked>
+            Overlay
+          </label>
+        </div>
+        
+        <div class="stack-item right">
+          <button id="reset-button" class="action">RESET</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div id="metrics" class="hud">
+    <section class="card">
+      <div class="card-header">
+        <div class="eyebrow">Server Tick Metrics</div>
+        <div id="tick-label">tick 0</div>
+      </div>
+      <div class="hud-items" id="metrics-items"></div>
+    </section>
+  </div>
+  
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
