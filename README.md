@@ -222,7 +222,7 @@ AOI 알고리즘의 성능을 수치로 확인하기 위한 값이다.
 
 알고리즘이 바뀌었을 때 무엇이 달라지는지 확인하기 위해 웹으로 접속해서 확인할 수 있도록 했다.
 
-![demo screenshot](https://github.com/catfoot-dev/AOI/blob/main/public/demo.png?raw=true)
+![demo screenshot](https://raw.githubusercontent.com/catfoot-dev/AOI/main/demo.png)
 
 데모를 통해 다음 내용을 확인할 수 있다.
 
