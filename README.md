@@ -2,8 +2,7 @@
 
 > C# raw WebSocket 서버와 HTML5 Canvas 클라이언트로 MMORPG의 AOI 동작을 시각화하고, Brute Force / Uniform Grid / Quadtree 알고리즘을 비교할 수 있게 만든 데모 프로젝트
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/Bz5V8e3XhCo?si=4wtovFwG45crOEMz" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
+[![AOI(Area of Interest) Demo](https://i9.ytimg.com/vi_webp/Bz5V8e3XhCo/mq2.webp?sqp=CJTB0M0G-oaymwEmCMACELQB8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGEQgXihlMA8=&rs=AOn4CLBKlqpoGaQMxu35RXXbWicEjyXWOQ)](https://youtu.be/Bz5V8e3XhCo?t=0s)
 _AOI 알고리즘과 상태, 서버 메트릭스를 확인할 수 있는 데모 영상_
 
 온라인 게임 서버에서 AOI(Area of Interest)는 네트워크 비용과 서버 연산 비용을 동시에 제어하는 핵심 장치이다.  
