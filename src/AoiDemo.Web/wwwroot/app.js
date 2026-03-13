@@ -12,19 +12,59 @@ const state = {
   input: { up: false, down: false, left: false, right: false },
   reconnectTimer: null,
 };
+const CHART_STACK = 140;
+const chartData = {
+  entities: Array.from({ length: CHART_STACK }),
+  visible: Array.from({ length: CHART_STACK }),
+  distanceChecks: Array.from({ length: CHART_STACK }),
+  queries: Array.from({ length: CHART_STACK }),
+  indexBuild: Array.from({ length: CHART_STACK }),
+  query: Array.from({ length: CHART_STACK }),
+  messages: Array.from({ length: CHART_STACK }),
+  bytes: Array.from({ length: CHART_STACK }),
+};
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-const algorithmSelect = document.getElementsByName("algorithm");
 const resetButton = document.getElementById("reset-button");
 const overlayToggle = document.getElementById("overlay-toggle");
+
+const chartEntities = document.getElementById("chart-entities");
+const ctxEntities = chartEntities.getContext("2d");
+const chartVisible = document.getElementById("chart-visible");
+const ctxVisible = chartVisible.getContext("2d");
+const chartDistanceChecks = document.getElementById("chart-distance-checks");
+const ctxDistanceChecks = chartDistanceChecks.getContext("2d");
+const chartQueries = document.getElementById("chart-queries");
+const ctxQueries = chartQueries.getContext("2d");
+const chartIndexBuild = document.getElementById("chart-index-build");
+const ctxIndexBuild = chartIndexBuild.getContext("2d");
+const chartQuery = document.getElementById("chart-query");
+const ctxQuery = chartQuery.getContext("2d");
+const chartMessages = document.getElementById("chart-messages");
+const ctxMessages = chartMessages.getContext("2d");
+const chartBytes = document.getElementById("chart-bytes");
+const ctxBytes = chartBytes.getContext("2d");
+
+chartEntities.width = chartVisible.width = chartDistanceChecks.width = chartQueries.width =
+    chartIndexBuild.width = chartQuery.width = chartMessages.width = chartBytes.width = '140';
+chartEntities.height = chartVisible.height = chartDistanceChecks.height = chartQueries.height =
+    chartIndexBuild.height = chartQuery.height = chartMessages.height = chartBytes.height = '40';
 
 const statusNodes = {
   connection: document.getElementById("connection-status"),
   player: document.getElementById("player-label"),
   visible: document.getElementById("visible-count"),
-  algorithm: document.getElementById("algorithm-label"),
-  tick: document.getElementById("tick-label"),
+  algorithm: document.getElementById("algorithm"),
+  tick: document.getElementById("tick"),
+  entityCount: document.getElementById("entity-count"),
+  totalVisibleCount: document.getElementById("total-visible-count"),
+  distanceChecks: document.getElementById("distance-checks"),
+  queryCount: document.getElementById("query-count"),
+  indexBuildMs: document.getElementById("index-build-ms"),
+  queryMs: document.getElementById("query-ms"),
+  messageCount: document.getElementById("message-count"),
+  bytesSent: document.getElementById("bytes-sent"),
   metrics: document.getElementById("metrics-items"),
 };
 
@@ -37,10 +77,8 @@ function boot() {
   window.addEventListener("keydown", handleKeyChange(true));
   window.addEventListener("keyup", handleKeyChange(false));
 
-  algorithmSelect.forEach(algorithm => {
-    algorithm.addEventListener("change", event => {
-      send({type: "changeAlgorithm", algorithm: event.target.value});
-    });
+  algorithm.addEventListener("change", event => {
+    send({type: "changeAlgorithm", algorithm: event.target.value});
   });
 
   resetButton.addEventListener("click", () => {
@@ -62,7 +100,7 @@ function connect() {
 
   socket.addEventListener("open", () => {
     setConnectionStatus("connected");
-    const name = `PLAYER#${Math.random().toString(16).slice(2, 6)}`;
+    const name = `PC ${Math.random().toString(16).slice(2, 6)}`;
     send({ type: "join", name });
   });
 
@@ -97,11 +135,7 @@ function handleServerMessage(message) {
       state.world = message.world;
       state.self = message.self;
       state.visible.clear();
-      algorithmSelect.forEach(algorithm => {
-        if (algorithm.value === message.algorithm) {
-          algorithm.checked = true;
-        }
-      });
+      algorithm.value = message.algorithm;
       break;
     case "worldReset":
       state.algorithm = message.algorithm;
@@ -110,11 +144,15 @@ function handleServerMessage(message) {
       state.visible.clear();
       state.metrics = null;
       state.overlay = { mode: "none", cellSize: 0, rectangles: [] };
-      algorithmSelect.forEach(algorithm => {
-        if (algorithm.value === message.algorithm) {
-          algorithm.checked = true;
-        }
-      });
+      algorithm.value = message.algorithm;
+      chartData.entities = Array.from({ length: CHART_STACK });
+      chartData.visible = Array.from({ length: CHART_STACK });
+      chartData.distanceChecks = Array.from({ length: CHART_STACK });
+      chartData.queries = Array.from({ length: CHART_STACK });
+      chartData.indexBuild = Array.from({ length: CHART_STACK });
+      chartData.query = Array.from({ length: CHART_STACK });
+      chartData.messages = Array.from({ length: CHART_STACK });
+      chartData.bytes = Array.from({ length: CHART_STACK });
       break;
     case "visibilityDelta":
       state.self = message.self;
@@ -149,8 +187,7 @@ function renderStatus() {
   statusNodes.connection.textContent = state.connectionStatus;
   statusNodes.player.textContent = state.playerLabel;
   statusNodes.visible.textContent = String(state.visible.size);
-  statusNodes.algorithm.textContent = prettifyAlgorithm(state.algorithm);
-  statusNodes.tick.textContent = state.metrics ? `tick ${state.metrics.tick}` : "tick 0";
+  statusNodes.tick.textContent = state.metrics?.tick ?? "0";
 }
 
 /**
@@ -158,31 +195,31 @@ function renderStatus() {
  */
 function renderMetrics() {
   const snapshot = state.metrics;
-  if (!snapshot) {
-    statusNodes.metrics.innerHTML = "";
-    return;
-  }
+  statusNodes.entityCount.textContent = snapshot?.entityCount ?? "0";
+  statusNodes.totalVisibleCount.textContent = snapshot?.totalVisibleCount ?? "0";
+  statusNodes.distanceChecks.textContent = snapshot?.distanceChecks ?? "0";
+  statusNodes.queryCount.textContent = snapshot?.queryCount ?? "0";
+  statusNodes.indexBuildMs.textContent = snapshot?.indexBuildMs.toFixed(3) ?? "0.0";
+  statusNodes.queryMs.textContent = snapshot?.queryMs.toFixed(3) ?? "0.0";
+  statusNodes.messageCount.textContent = snapshot?.messageCount ?? "0";
+  statusNodes.bytesSent.textContent = snapshot?.bytesSent ?? "0";
 
-  const items = [
-    ["Entities", snapshot.entityCount],
-    ["Visible", snapshot.totalVisibleCount],
-    ["Distance Checks", snapshot.distanceChecks],
-    ["Queries", snapshot.queryCount],
-    ["Index Build (ms)", snapshot.indexBuildMs.toFixed(3)],
-    ["Query (ms)", snapshot.queryMs.toFixed(3)],
-    ["Messages", snapshot.messageCount],
-    ["Bytes", snapshot.bytesSent],
-  ];
-
-  statusNodes.metrics.innerHTML = items
-    .map(
-      ([label, value]) => `
-        <div class="hud-item">
-          <div class="hud-item-label">${label}</div>
-          <div class="hud-item-value">${value}</div>
-        </div>`,
-    )
-    .join("");
+  chartData.entities.shift();
+  chartData.entities.push(snapshot?.entityCount);
+  chartData.visible.shift();
+  chartData.visible.push(snapshot?.totalVisibleCount);
+  chartData.distanceChecks.shift();
+  chartData.distanceChecks.push(snapshot?.distanceChecks);
+  chartData.queries.shift();
+  chartData.queries.push(snapshot?.queryCount);
+  chartData.indexBuild.shift();
+  chartData.indexBuild.push(snapshot?.indexBuildMs);
+  chartData.query.shift();
+  chartData.query.push(snapshot?.queryMs);
+  chartData.messages.shift();
+  chartData.messages.push(snapshot?.messageCount);
+  chartData.bytes.shift();
+  chartData.bytes.push(snapshot?.bytesSent);
 }
 
 /**
@@ -209,12 +246,11 @@ function render() {
   drawWorldBounds(worldToScreen, zoom);
   drawDebugOverlay(worldToScreen, zoom);
   drawAoiCircle(worldToScreen, zoom);
-
   for (const entity of state.visible.values()) {
     drawEntity(entity, entity.kind === "player" ? "#8fc0ff" : "#80f1d3", worldToScreen, zoom);
   }
-
   drawEntity(state.self, "#bfdfff", worldToScreen, zoom, true);
+  drawChart();
   requestAnimationFrame(render);
 }
 
@@ -335,6 +371,34 @@ function drawEntity(entity, color, worldToScreen, zoom, isSelf = false) {
   ctx.restore();
 }
 
+function drawChart() {
+  drawHudChart(ctxEntities, chartData.entities);
+  drawHudChart(ctxVisible, chartData.visible);
+  drawHudChart(ctxDistanceChecks, chartData.distanceChecks);
+  drawHudChart(ctxQueries, chartData.queries);
+  drawHudChart(ctxIndexBuild, chartData.indexBuild);
+  drawHudChart(ctxQuery, chartData.query);
+  drawHudChart(ctxMessages, chartData.messages);
+  drawHudChart(ctxBytes, chartData.bytes);
+}
+
+function drawHudChart(ctx, data) {
+  const max = Math.max(...data.filter(Number)) || 10;
+  const ratio = 35 / max;
+  ctx.save();
+  ctx.clearRect(0, 0, 140, 40);
+  for (let i = 0; i < data.length; i++) {
+    if (data[i] === undefined || data[i] === null) continue;
+    ctx.lineWidth = 0;
+    ctx.fillStyle = "rgba(48,192,48,0.15)";
+    ctx.fillRect(i, 39 - data[i] * ratio, 1, 40);
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "rgba(52,211,52,0.8)";
+    ctx.fillRect(i, 39 - data[i] * ratio, 1, 1);
+  }
+  ctx.restore();
+}
+
 /**
  * CSS 픽셀 크기에 맞춰 캔버스의 실제 드로잉 버퍼와 변환 행렬을 갱신합니다.
  */
@@ -388,25 +452,6 @@ function send(payload) {
   }
 
   state.socket.send(JSON.stringify(payload));
-}
-
-/**
- * 알고리즘 식별자를 UI에 표시하기 좋은 레이블 문자열로 바꿉니다.
- *
- * @param {string | null | undefined} value 서버나 UI 상태에 저장된 알고리즘 식별자입니다.
- * @returns {string} 화면에 표시할 사람이 읽기 쉬운 알고리즘 이름입니다.
- */
-function prettifyAlgorithm(value) {
-  switch (value) {
-    case "bruteForce":
-      return "Brute Force";
-    case "uniformGrid":
-      return "Uniform Grid";
-    case "quadtree":
-      return "Quadtree";
-    default:
-      return value ?? "-";
-  }
 }
 
 /**

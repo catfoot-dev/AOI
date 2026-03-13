@@ -12,65 +12,41 @@
   <div id="status" class="hud">
     <section class="card">
       <div class="card-header">
-        <div class="eyebrow">Status</div>
+        <div class="eyebrow">AOI(Area of Interest) Demo</div>
+        <div class="tick-label">
+          <label class="toggle">
+            Debug
+            <input type="checkbox" id="overlay-toggle" checked>
+          </label>
+          
+          <button id="reset-button" class="action">RESET</button>
+        </div>
       </div>
 
       <div class="hud-items">
         <div class="hud-item">
-          <div class="hud-item-label">연결</div>
+          <div class="hud-item-label">Status</div>
           <div id="connection-status" class="hud-item-value">connecting</div>
         </div>
         <div class="hud-item">
-          <div class="hud-item-label">플레이어</div>
+          <div class="hud-item-label">Player</div>
           <div id="player-label" class="hud-item-value">-</div>
         </div>
         <div class="hud-item">
-          <div class="hud-item-label">가시 엔티티</div>
+          <div class="hud-item-label">Visible Entity</div>
           <div id="visible-count" class="hud-item-value">0</div>
         </div>
         <div class="hud-item">
-          <div class="hud-item-label">알고리즘</div>
-          <div id="algorithm-label" class="hud-item-value">-</div>
-        </div>
-      </div>
-    </section>
-  </div>
-  
-  <div id="control" class="hud">
-    <section class="card">
-      <div class="card-header">
-        <div class="eyebrow">AOI(Area of Interest) Demo</div>
-      </div>
-
-      <div class="stack">
-        <div class="stack-item">
-          <div class="stack-label">Algorithm</div>
-          <div class="field">
-            <label for="algorithm-brute-force">
-              <input type="radio" id="algorithm-brute-force" name="algorithm" value="bruteForce">
-              Brute Force
-            </label>
-            <label for="algorithm-uniform-grid">
-              <input type="radio" id="algorithm-uniform-grid" name="algorithm" value="uniformGrid">
-              Uniform Grid
-            </label>
-            <label for="algorithm-quadtree">
-              <input type="radio" id="algorithm-quadtree" name="algorithm" value="quadtree">
-              Quadtree
-            </label>
+          <div class="hud-item-label">
+            <label for="algorithm">Algorithm</label>
           </div>
-        </div>
-  
-        <div class="stack-item">
-          <div class="stack-label">Area</div>
-          <label class="toggle">
-            <input type="checkbox" id="overlay-toggle" checked>
-            Overlay
-          </label>
-        </div>
-        
-        <div class="stack-item right">
-          <button id="reset-button" class="action">RESET</button>
+          <div class="hud-item-value">
+            <select name="algorithm" id="algorithm">
+              <option value="bruteForce" selected>Brute Force</option>
+              <option value="uniformGrid">Uniform Grid</option>
+              <option value="quadtree">Quadtree</option>
+            </select>
+          </div>
         </div>
       </div>
     </section>
@@ -80,9 +56,58 @@
     <section class="card">
       <div class="card-header">
         <div class="eyebrow">Server Tick Metrics</div>
-        <div id="tick-label">tick 0</div>
+        <div class="tick-label">tick <span id="tick">0</span></div>
       </div>
-      <div class="hud-items" id="metrics-items"></div>
+      
+      <div class="hud-items">
+        <div class="hud-item">
+          <canvas class="chart" id="chart-entities" width="140" height="40"></canvas>
+          <div class="hud-item-label">Entities</div>
+          <div class="hud-item-value" id="entity-count">0</div>
+        </div>
+
+        <div class="hud-item">
+          <canvas class="chart" id="chart-visible" width="140" height="40"></canvas>
+          <div class="hud-item-label">Visible</div>
+          <div class="hud-item-value" id="total-visible-count">0</div>
+        </div>
+
+        <div class="hud-item">
+          <canvas class="chart" id="chart-distance-checks" width="140" height="40"></canvas>
+          <div class="hud-item-label">Distance Checks</div>
+          <div class="hud-item-value" id="distance-checks">0</div>
+        </div>
+
+        <div class="hud-item">
+          <canvas class="chart" id="chart-queries" width="140" height="40"></canvas>
+          <div class="hud-item-label">Queries</div>
+          <div class="hud-item-value" id="query-count">0</div>
+        </div>
+
+        <div class="hud-item">
+          <canvas class="chart" id="chart-index-build" width="140" height="40"></canvas>
+          <div class="hud-item-label">Index Build (ms)</div>
+          <div class="hud-item-value" id="index-build-ms">0.0</div>
+        </div>
+
+        <div class="hud-item">
+          <canvas class="chart" id="chart-query" width="140" height="40"></canvas>
+          <div class="hud-item-label">Query (ms)</div>
+          <div class="hud-item-value" id="query-ms">0.0</div>
+        </div>
+
+        <div class="hud-item">
+          <canvas class="chart" id="chart-messages" width="140" height="40"></canvas>
+          <div class="hud-item-label">Messages</div>
+          <div class="hud-item-value" id="message-count">0</div>
+        </div>
+
+        <div class="hud-item">
+          <canvas class="chart" id="chart-bytes" width="140" height="40"></canvas>
+          <div class="hud-item-label">Bytes</div>
+          <div class="hud-item-value" id="bytes-sent">0</div>
+        </div>
+      </div>
     </section>
   </div>
   
